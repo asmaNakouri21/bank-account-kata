@@ -1,5 +1,6 @@
 package com.example.bank.service;
 
+import com.example.bank.exception.DepositAcountException;
 import com.example.bank.model.BankAccount;
 import com.example.bank.services.BankAccountService;
 import com.example.bank.services.BankAccountServiceImpl;
@@ -19,7 +20,7 @@ public class BankAccountServiceTest {
 
     @Test
     @DisplayName("Should add 100 euros to an account with an initial balance of 0")
-    public void testDepositAddsAmountToEmptyAccount(){
+    public void testDepositAddsAmountToEmptyAccount() throws DepositAcountException {
         // Arrange
         BankAccount account = new BankAccount(); // Initial balance of 0
         BigDecimal depositAmount = new BigDecimal("100.00");
@@ -34,7 +35,7 @@ public class BankAccountServiceTest {
 
     @Test
     @DisplayName("Should add 50 euros to an account with an initial balance of 100")
-    public void testDepositAddsAmountToAccountWithBalance100(){
+    public void testDepositAddsAmountToAccountWithBalance100() throws DepositAcountException {
         // Arrange
         BankAccount account = new BankAccount(); // Initial balance of 0
         account.setBalance(new BigDecimal("100.00"));
@@ -57,7 +58,7 @@ public class BankAccountServiceTest {
         BigDecimal depositAmount = new BigDecimal("-50.00");
 
         // Act
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(DepositAcountException.class,
                 () -> bankAccountService.deposit(account, depositAmount),
                 "A deposit of negative Amount should not be allowed.");
     }
@@ -69,7 +70,7 @@ public class BankAccountServiceTest {
         BigDecimal depositAmount = new BigDecimal("00");
 
         // Act
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(DepositAcountException.class,
                 () -> bankAccountService.deposit(account, depositAmount),
                 "A deposit of zero should not be allowed.");
     }
