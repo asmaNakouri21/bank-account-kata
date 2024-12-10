@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class BankAccountControllerTest {
     @InjectMocks
@@ -69,7 +68,7 @@ class BankAccountControllerTest {
         BigDecimal amount = new BigDecimal("100.00");
 
         // Mocking the service call to simulate a successful deposit
-        doNothing().when(bankAccountService).deposit(eq(ACCOUNT_ID), eq(amount));
+        doNothing().when(bankAccountService).makeDeposit(eq(ACCOUNT_ID), eq(amount));
 
         MockHttpServletResponse response = mockMvc
                 .perform(post("/account/{id}/depositAccount", ACCOUNT_ID)
@@ -86,7 +85,7 @@ class BankAccountControllerTest {
         BigDecimal amount = new BigDecimal("-50.00"); // Invalid deposit (negative)
 
         // Mocking the service to throw DepositAcountException
-        doThrow(new DepositAcountException("Deposit amount must be greater than zero")).when(bankAccountService).deposit(eq(ACCOUNT_ID), eq(amount));
+        doThrow(new DepositAcountException("Deposit amount must be greater than zero")).when(bankAccountService).makeDeposit(eq(ACCOUNT_ID), eq(amount));
 
         MockHttpServletResponse response = mockMvc
                 .perform(post("/account/{id}/depositAccount", ACCOUNT_ID)
@@ -103,7 +102,7 @@ class BankAccountControllerTest {
         BigDecimal amount = new BigDecimal("100.00");
 
         // Mocking the service to throw a general exception
-        doThrow(new RuntimeException("Unexpected error")).when(bankAccountService).deposit(eq(ACCOUNT_ID), eq(amount));
+        doThrow(new RuntimeException("Unexpected error")).when(bankAccountService).makeDeposit(eq(ACCOUNT_ID), eq(amount));
 
         MockHttpServletResponse response = mockMvc
                 .perform(post("/account/{id}/depositAccount", ACCOUNT_ID)

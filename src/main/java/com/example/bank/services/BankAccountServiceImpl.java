@@ -22,7 +22,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     }
 
     @Override
-    public void deposit(Long accountId, BigDecimal amount) throws DepositAcountException {
+    public void makeDeposit(Long accountId, BigDecimal amount) throws DepositAcountException {
         BankAccount account = getAccountById(accountId);
         Objects.requireNonNull(amount, "Deposit amount cannot be null.");
         if (amount.signum() <= 0) {
@@ -31,8 +31,13 @@ public class BankAccountServiceImpl implements BankAccountService {
         account.setBalance(account.getBalance().add(amount));
     }
 
+    @Override
     public BankAccount getAccountById(Long accountId) throws DepositAcountException {
         return bankAccountRepository.findById(accountId)
                 .orElseThrow(() -> new DepositAcountException("Account not found"));
+    }
+
+    @Override
+    public void makeWithdraw(Long accountId, BigDecimal amount) {
     }
 }

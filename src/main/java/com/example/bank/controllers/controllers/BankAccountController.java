@@ -49,7 +49,7 @@ public class BankAccountController {
     public ResponseEntity<String> makeDeposit(@PathVariable Long id,
                                               @RequestParam(name = "amount") BigDecimal amount) {
         try {
-            bankService.deposit(id, amount);
+            bankService.makeDeposit(id, amount);
             return ResponseEntity.ok("Deposit successful");
         } catch (DepositAcountException e) {
             logger.error("Deposit failed for account ID: {} with amount: {}", id, amount, e);
