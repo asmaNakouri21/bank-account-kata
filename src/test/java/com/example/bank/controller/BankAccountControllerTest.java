@@ -1,8 +1,9 @@
-package com.example.bank.controllers.controllers;
+package com.example.bank.controller;
 
+import com.example.bank.exception.AccountNotFoundException;
+import com.example.bank.exception.InvalidAmountException;
 import com.example.bank.model.BankAccount;
-import com.example.bank.exception.DepositAcountException;
-import com.example.bank.services.BankAccountServiceImpl;
+import com.example.bank.services.impl.BankAccountServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -41,21 +43,21 @@ class BankAccountControllerTest {
     @Test
     @DisplayName("Should return the account and statut OK when the id exists")
     public void testGetAccountById_Success() throws Exception {
-        BankAccount mockAccount = new BankAccount(1L,  new BigDecimal("100.00"));
+        BankAccount mockAccount = new BankAccount(1L,  new BigDecimal("100.00"), new ArrayList<>());
         when(bankAccountService.getAccountById(ACCOUNT_ID)).thenReturn(mockAccount);
 
         MockHttpServletResponse response = mockMvc.perform(
                 get("/account/1")).andReturn().getResponse();
 
         assertEquals(HttpStatus.OK.value(), response.getStatus());
-        assertEquals("{\"id\":1,\"balance\":100.00}", response.getContentAsString());
+        assertEquals("{\"id\":1,\"balance\":100.00,\"operations\":[]}", response.getContentAsString());
     }
 
     @Test
     @DisplayName("Should return Not Found when the id does not exists")
     public void testGetAccountById_NotFound() throws Exception {
         Long accountId = 999L;
-        when(bankAccountService.getAccountById(accountId)).thenThrow(new DepositAcountException("Account not found"));
+        when(bankAccountService.getAccountById(accountId)).thenThrow(new AccountNotFoundException(accountId));
 
         MockHttpServletResponse response = mockMvc.perform(
                 get("/account/999")).andReturn().getResponse();
@@ -83,7 +85,7 @@ class BankAccountControllerTest {
         BigDecimal amount = new BigDecimal("-50.00"); // Invalid deposit (negative)
 
         // Mocking the service to throw DepositAcountException
-        doThrow(new DepositAcountException("Deposit amount must be greater than zero")).when(bankAccountService).makeDeposit(eq(ACCOUNT_ID), eq(amount));
+        doThrow(new InvalidAmountException("Deposit amount must be greater than zero")).when(bankAccountService).makeDeposit(eq(ACCOUNT_ID), eq(amount));
 
         MockHttpServletResponse response = mockMvc
                 .perform(post("/account/{id}/depositAccount", ACCOUNT_ID)
@@ -130,7 +132,7 @@ class BankAccountControllerTest {
     public void testMakeWithdrawal_Fail_WithdrawalAcountException() throws Exception {
         BigDecimal amount = new BigDecimal("-50.00");
 
-        doThrow(new DepositAcountException("Withdrawal amount must be greater than zero")).when(bankAccountService)
+        doThrow(new InvalidAmountException("Withdrawal amount must be greater than zero")).when(bankAccountService)
                 .makeWithdraw(eq(ACCOUNT_ID), eq(amount));
 
         MockHttpServletResponse response = mockMvc

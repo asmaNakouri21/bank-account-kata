@@ -1,9 +1,10 @@
 package com.example.bank.service;
 
 import com.example.bank.dao.BankAccountRepository;
-import com.example.bank.exception.DepositAcountException;
+import com.example.bank.exception.AccountNotFoundException;
+import com.example.bank.exception.InvalidAmountException;
 import com.example.bank.model.BankAccount;
-import com.example.bank.services.BankAccountServiceImpl;
+import com.example.bank.services.impl.BankAccountServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,9 +32,24 @@ public class BankAccountServiceTest {
         MockitoAnnotations.initMocks(this);
     }
 
+
+    private Optional<BankAccount> getMockedAccount() {
+        return Optional.of(BankAccount.builder()
+                .id(1L)
+                .balance(new BigDecimal(100.00))
+                .build());
+    }
+
+    private Optional<BankAccount> getMockedEmptyAccount() {
+        return Optional.of(BankAccount.builder()
+                .id(1L)
+                .balance(new BigDecimal(0))
+                .build());
+    }
+
     @Test
     @DisplayName("Should add 100 euros to an account with an initial balance of 0")
-    public void testDepositAddsAmountToEmptyAccount() throws DepositAcountException {
+    public void testDepositAddsAmountToEmptyAccount()  {
         // Arrange
         Optional<BankAccount> mockedAccount = getMockedEmptyAccount();
         when(bankAccountRepository.findById(accountId)).thenReturn(mockedAccount);
@@ -50,7 +66,7 @@ public class BankAccountServiceTest {
 
     @Test
     @DisplayName("Should add 50 euros to an account with an initial balance of 100")
-    public void testDepositAddsAmountToAccountWithBalance100() throws DepositAcountException {
+    public void testDepositAddsAmountToAccountWithBalance100(){
         // Arrange
         Optional<BankAccount> mockedAccount = getMockedAccount();
         when(bankAccountRepository.findById(accountId)).thenReturn(mockedAccount);
@@ -75,7 +91,7 @@ public class BankAccountServiceTest {
         BigDecimal depositAmount = new BigDecimal("-50.00");
 
         // Act
-        assertThrows(DepositAcountException.class,
+        assertThrows(InvalidAmountException.class,
                 () -> bankAccountService.makeDeposit(accountId, depositAmount),
                 "A deposit of negative Amount should not be allowed.");
     }
@@ -88,13 +104,14 @@ public class BankAccountServiceTest {
         BigDecimal depositAmount = new BigDecimal("0");
 
         // Act
-        assertThrows(DepositAcountException.class,
+        assertThrows(InvalidAmountException.class,
                 () -> bankAccountService.makeDeposit(accountId, depositAmount),
                 "A deposit of zero should not be allowed.");
     }
 
     @Test
-    public void testGetAccountById_ReturnsAccount_WhenAccountExists() throws DepositAcountException {
+    @DisplayName("Should retutn the account when the accountId exist")
+    public void testGetAccountById_ReturnsAccount_WhenAccountExists(){
         // Arrange
         Optional<BankAccount> mockedAccount = getMockedAccount();
         when(bankAccountRepository.findById(accountId)).thenReturn(mockedAccount);
@@ -115,28 +132,14 @@ public class BankAccountServiceTest {
     public void testGetAccountById_ThrowsException_WhenAccountDoesNotExist() {
         when(bankAccountRepository.findById(accountId)).thenReturn(Optional.empty());
 
-        assertThrows(DepositAcountException.class,
+        assertThrows(AccountNotFoundException.class,
                 () -> bankAccountService.getAccountById(accountId),
                 "Account does not exist");
     }
 
-    private Optional<BankAccount> getMockedAccount() {
-        return Optional.of(BankAccount.builder()
-                .id(1L)
-                .balance(new BigDecimal(100.00))
-                .build());
-    }
-
-    private Optional<BankAccount> getMockedEmptyAccount() {
-        return Optional.of(BankAccount.builder()
-                .id(1L)
-                .balance(new BigDecimal(0))
-                .build());
-    }
-
     @Test
     @DisplayName("Should deduct the withdrawal amount when balance is sufficient")
-    void testWithdrawalWhenBalanceIsSufficient() throws DepositAcountException {
+    void testWithdrawalWhenBalanceIsSufficient(){
         // Arrange
         Optional<BankAccount> account = getMockedAccount();
         when(bankAccountRepository.findById(1L)).thenReturn(account);
@@ -191,10 +194,9 @@ public class BankAccountServiceTest {
         BigDecimal withdrawalAmount = new BigDecimal("50.00");
 
         // Act & Assert
-        assertThrows(DepositAcountException.class,
+        assertThrows(AccountNotFoundException.class,
                 () -> bankAccountService.getAccountById(accountId),
                 "Account does not exist");
 
     }
-
 }
