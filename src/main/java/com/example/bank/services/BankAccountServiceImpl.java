@@ -31,8 +31,8 @@ public class BankAccountServiceImpl implements BankAccountService {
         account.setBalance(account.getBalance().add(amount));
     }
 
-    private BankAccount getAccountById(Long accountId) {
+    public BankAccount getAccountById(Long accountId) throws DepositAcountException {
         return bankAccountRepository.findById(accountId)
-                .orElseThrow(() -> new RuntimeException("Account does not exist"));
+                .orElseThrow(() -> new DepositAcountException("Account does not exist"));
     }
 }

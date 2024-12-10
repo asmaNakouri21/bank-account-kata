@@ -94,6 +94,33 @@ public class BankAccountServiceTest {
                 "A deposit of zero should not be allowed.");
     }
 
+    @Test
+    public void testGetAccountById_ReturnsAccount_WhenAccountExists() throws DepositAcountException {
+        // Arrange
+        Optional<BankAccount> mockedAccount = getMockedAccount();
+        when(bankAccountRepository.findById(accountId)).thenReturn(mockedAccount);
+
+        // Act
+        BankAccount result = bankAccountService.getAccountById(accountId);
+
+        // Assert
+        assertNotNull(result, "accountResult is not null");
+        assertEquals(accountId, result.getId(), "the acount ID is 1L");
+        assertEquals(new BigDecimal("100"), result.getBalance(),
+                "The account balance is 100.00");
+
+    }
+
+    @Test
+    @DisplayName("Should throw an error when the account Id does not Exist")
+    public void testGetAccountById_ThrowsException_WhenAccountDoesNotExist() {
+        when(bankAccountRepository.findById(accountId)).thenReturn(Optional.empty());
+
+        assertThrows(DepositAcountException.class,
+                () -> bankAccountService.getAccountById(accountId),
+                "Account does not exist");
+    }
+
     private Optional<BankAccount> getMockedAccount() {
         return Optional.of(BankAccount.builder()
                 .id(1L)
