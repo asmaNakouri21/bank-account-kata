@@ -2,7 +2,7 @@ package com.example.bank.controllers.controllers;
 
 import com.example.bank.model.BankAccount;
 import com.example.bank.exception.DepositAcountException;
-import com.example.bank.services.BankAccountServiceImpl;
+import com.example.bank.services.impl.BankAccountServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -41,7 +42,7 @@ class BankAccountControllerTest {
     @Test
     @DisplayName("Should return the account and statut OK when the id exists")
     public void testGetAccountById_Success() throws Exception {
-        BankAccount mockAccount = new BankAccount(1L,  new BigDecimal("100.00"));
+        BankAccount mockAccount = new BankAccount(1L,  new BigDecimal("100.00"), new ArrayList<>());
         when(bankAccountService.getAccountById(ACCOUNT_ID)).thenReturn(mockAccount);
 
         MockHttpServletResponse response = mockMvc.perform(

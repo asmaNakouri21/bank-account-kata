@@ -4,7 +4,7 @@ package com.example.bank.controllers.controllers;
 import com.example.bank.exception.DepositAcountException;
 import com.example.bank.model.BankAccount;
 import com.example.bank.services.BankAccountService;
-import com.example.bank.services.BankAccountServiceImpl;
+import com.example.bank.services.impl.BankAccountServiceImpl;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

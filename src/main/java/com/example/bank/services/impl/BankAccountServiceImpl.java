@@ -1,15 +1,19 @@
-package com.example.bank.services;
+package com.example.bank.services.impl;
 
 import com.example.bank.dao.BankAccountRepository;
 import com.example.bank.enums.OperationType;
 import com.example.bank.exception.DepositAcountException;
 import com.example.bank.model.BankAccount;
+import com.example.bank.model.Operation;
+import com.example.bank.services.BankAccountService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -25,7 +29,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     @Override
     public void makeDeposit(Long accountId, BigDecimal amount) throws DepositAcountException {
         BankAccount account = getAccountById(accountId);
-        validateAmount(amount,account.getBalance(), OperationType.DEPOSIT);
+        validateAmount(amount, account.getBalance(), OperationType.DEPOSIT);
         updateAccountBalance(account, amount);
     }
 
@@ -38,7 +42,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     @Override
     public void makeWithdraw(Long accountId, BigDecimal amount) throws DepositAcountException {
         BankAccount account = getAccountById(accountId);
-        validateAmount(amount, account.getBalance(),OperationType.WITHDRAWAL);
+        validateAmount(amount, account.getBalance(), OperationType.WITHDRAWAL);
         updateAccountBalance(account, amount.negate());
     }
 

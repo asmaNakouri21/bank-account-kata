@@ -3,7 +3,7 @@ package com.example.bank.service;
 import com.example.bank.dao.BankAccountRepository;
 import com.example.bank.exception.DepositAcountException;
 import com.example.bank.model.BankAccount;
-import com.example.bank.services.BankAccountServiceImpl;
+import com.example.bank.services.impl.BankAccountServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +29,21 @@ public class BankAccountServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
+    }
+
+
+    private Optional<BankAccount> getMockedAccount() {
+        return Optional.of(BankAccount.builder()
+                .id(1L)
+                .balance(new BigDecimal(100.00))
+                .build());
+    }
+
+    private Optional<BankAccount> getMockedEmptyAccount() {
+        return Optional.of(BankAccount.builder()
+                .id(1L)
+                .balance(new BigDecimal(0))
+                .build());
     }
 
     @Test
@@ -94,6 +109,7 @@ public class BankAccountServiceTest {
     }
 
     @Test
+    @DisplayName("Should retutn the account when the accountId exist")
     public void testGetAccountById_ReturnsAccount_WhenAccountExists() throws DepositAcountException {
         // Arrange
         Optional<BankAccount> mockedAccount = getMockedAccount();
@@ -118,20 +134,6 @@ public class BankAccountServiceTest {
         assertThrows(DepositAcountException.class,
                 () -> bankAccountService.getAccountById(accountId),
                 "Account does not exist");
-    }
-
-    private Optional<BankAccount> getMockedAccount() {
-        return Optional.of(BankAccount.builder()
-                .id(1L)
-                .balance(new BigDecimal(100.00))
-                .build());
-    }
-
-    private Optional<BankAccount> getMockedEmptyAccount() {
-        return Optional.of(BankAccount.builder()
-                .id(1L)
-                .balance(new BigDecimal(0))
-                .build());
     }
 
     @Test
@@ -196,5 +198,4 @@ public class BankAccountServiceTest {
                 "Account does not exist");
 
     }
-
 }
