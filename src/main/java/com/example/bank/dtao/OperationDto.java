@@ -1,10 +1,12 @@
-package com.example.bank.dtao.dto;
+package com.example.bank.dtao;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -14,9 +16,9 @@ import java.util.Date;
 public class OperationDto {
     private Long id;
 
-    private Date operationDate;
+    private LocalDateTime operationDate;
 
-    private int amount;
+    private BigDecimal amount;
 
     private String typeOp;
 }

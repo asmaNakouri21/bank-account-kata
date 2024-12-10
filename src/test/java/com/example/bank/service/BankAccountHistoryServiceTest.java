@@ -1,7 +1,7 @@
 package com.example.bank.service;
 
 import com.example.bank.dao.BankAccountHistoryRepository;
-import com.example.bank.dtao.dto.OperationDto;
+import com.example.bank.dtao.OperationDto;
 import com.example.bank.model.Deposit;
 import com.example.bank.model.Operation;
 import com.example.bank.model.Withdraw;
@@ -14,9 +14,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.*;
@@ -81,18 +82,18 @@ public class BankAccountHistoryServiceTest {
         List<Operation> operationList = Arrays.asList(
                 Deposit.builder()
                         .id(2L)
-                        .amount(100)
-                        .operationDate(new Date())
+                        .operationDate( LocalDateTime.now())
+                        .amount(new BigDecimal(100.00))
                         .build(),
                 Withdraw.builder()
                         .id(1L)
-                        .operationDate(new Date())
-                        .amount((50))
+                        .operationDate(LocalDateTime.now())
+                        .amount(new BigDecimal(30.00))
                         .build(),
                 Deposit.builder()
                         .id(3L)
-                        .amount(30)
-                        .operationDate(new Date())
+                        .amount(new BigDecimal(30.00))
+                        .operationDate(LocalDateTime.now())
                         .build()
         );
         return operationList;

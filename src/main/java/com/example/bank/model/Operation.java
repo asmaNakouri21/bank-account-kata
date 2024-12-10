@@ -17,6 +17,8 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -32,10 +34,10 @@ public class Operation {
     private Long id;
 
     @Column
-    private Date operationDate;
+    private LocalDateTime operationDate;
 
     @Column
-    private int amount;
+    private BigDecimal amount;
 
     @ManyToOne
     @JoinColumn(name = "ID_CLIENT")

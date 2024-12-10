@@ -1,7 +1,9 @@
-package com.example.bank.controllers.controllers;
+package com.example.bank.controllers;
 
 
-import com.example.bank.exception.DepositAcountException;
+import com.example.bank.exception.AccountNotFoundException;
+import com.example.bank.exception.InsufficientFundsException;
+import com.example.bank.exception.InvalidAmountException;
 import com.example.bank.model.BankAccount;
 import com.example.bank.services.BankAccountService;
 import com.example.bank.services.impl.BankAccountServiceImpl;
@@ -39,7 +41,7 @@ public class BankAccountController {
         try {
             BankAccount account = bankService.getAccountById(id);
             return ResponseEntity.ok(account);
-        } catch (DepositAcountException e) {
+        } catch (AccountNotFoundException e) {
             logger.error("Account not found with ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
@@ -51,7 +53,7 @@ public class BankAccountController {
         try {
             bankService.makeDeposit(id, amount);
             return ResponseEntity.ok("Deposit successful");
-        } catch (DepositAcountException e) {
+        } catch (InvalidAmountException e) {
             logger.error("Deposit failed for account ID: {} with amount: {}", id, amount, e);
             String errorMessage = "Deposit failed: " + e.getMessage();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
@@ -67,8 +69,12 @@ public class BankAccountController {
         try {
             bankService.makeWithdraw(id, amount);
             return ResponseEntity.ok("Withdrawal successful");
-        } catch (DepositAcountException e) {
+        } catch (InvalidAmountException e) {
             logger.error("Withdrawal failed for account ID: {} with amount: {}", id, amount, e);
+            String errorMessage = "Withdrawal failed: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+        } catch (InsufficientFundsException e) {
+            logger.error("Insufficient Funds for account ID: {} with amount: {}", id, amount, e);
             String errorMessage = "Withdrawal failed: " + e.getMessage();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
         } catch (Exception e) {
