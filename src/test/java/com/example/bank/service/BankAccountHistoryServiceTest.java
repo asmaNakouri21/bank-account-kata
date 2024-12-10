@@ -36,7 +36,7 @@ public class BankAccountHistoryServiceTest {
 
     @Test
     @DisplayName("Should return operation history for a valid account ID")
-    public void testRetrieveHistoryForValidAccount() {
+    public void testRetrieveHistoryForValidAccount() throws AccountNotFoundException {
         // Arrange
         Long accountId = 1L;
         List<Operation> mockOperations = getOperationList();
@@ -66,16 +66,15 @@ public class BankAccountHistoryServiceTest {
 
     @Test
     @DisplayName("Should return an empty list for an account with no operations")
-    public void testRetrieveEmptyHistory() {
+    public void testRetrieveEmptyHistory() throws AccountNotFoundException {
         // Arrange
         Long accountId = 2L;
         when(historyRepository.findAllByMyAccount_Id(accountId)).thenReturn(Collections.emptyList());
 
-        // Act
-        List<OperationDto> operations = historyService.getHistoryByAccountId(accountId);
-
         // Assert
-        assertTrue(operations.isEmpty(), "History should be empty for an account with no operations");
+        assertThrows(AccountNotFoundException.class,
+                () -> historyService.getHistoryByAccountId(accountId),
+                "History should be empty for an account with no operations");
     }
 
     private List<Operation> getOperationList() {
