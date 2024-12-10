@@ -1,35 +1,51 @@
 package com.example.bank.service;
 
+import com.example.bank.dao.BankAccountRepository;
 import com.example.bank.exception.DepositAcountException;
 import com.example.bank.model.BankAccount;
-import com.example.bank.services.BankAccountService;
 import com.example.bank.services.BankAccountServiceImpl;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import static org.mockito.Mockito.when;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 import java.math.BigDecimal;
-
+import java.util.Optional;
 
 
 public class BankAccountServiceTest {
+    @InjectMocks
+    BankAccountServiceImpl bankAccountService;
 
-    BankAccountService bankAccountService = new BankAccountServiceImpl();
+    @Mock
+    BankAccountRepository bankAccountRepository;
+    private final static Long accountId = 1L;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
+    }
 
     @Test
     @DisplayName("Should add 100 euros to an account with an initial balance of 0")
     public void testDepositAddsAmountToEmptyAccount() throws DepositAcountException {
         // Arrange
-        BankAccount account = new BankAccount(); // Initial balance of 0
+        Optional<BankAccount> mockedAccount = getMockedEmptyAccount();
+        when(bankAccountRepository.findById(accountId)).thenReturn(mockedAccount);
+
         BigDecimal depositAmount = new BigDecimal("100.00");
 
         // Act
-        bankAccountService.deposit(account, depositAmount);
+        bankAccountService.deposit(accountId, depositAmount);
 
         // Assert
-        assertEquals(new BigDecimal("100.00"), account.getBalance(),
+        assertEquals(new BigDecimal("100.00"), mockedAccount.get().getBalance(),
                 "The account balance should reflect the deposited amount of 100 euros.");
     }
 
@@ -37,41 +53,58 @@ public class BankAccountServiceTest {
     @DisplayName("Should add 50 euros to an account with an initial balance of 100")
     public void testDepositAddsAmountToAccountWithBalance100() throws DepositAcountException {
         // Arrange
-        BankAccount account = new BankAccount(); // Initial balance of 0
-        account.setBalance(new BigDecimal("100.00"));
-        BigDecimal depositAmount = new BigDecimal("50.00");
+        Optional<BankAccount> mockedAccount = getMockedAccount();
+        when(bankAccountRepository.findById(accountId)).thenReturn(mockedAccount);
+
+        BigDecimal depositAmount = new BigDecimal("50.29");
 
         // Act
-        bankAccountService.deposit(account, depositAmount);
+        bankAccountService.deposit(accountId, depositAmount);
 
         // Assert
-        assertEquals(new BigDecimal("150.00"), account.getBalance(),
-                "The account balance should reflect the deposited amount of 150 euros.");
+        assertEquals(new BigDecimal("150.29"), mockedAccount.get().getBalance(),
+                "The account balance should reflect the deposited amount of 150.29 euros.");
     }
 
     @Test
     @DisplayName("Should throw an error when a negative deposit amount is provided")
     public void testDepositThrowsErrorForNegativeAmount() {
         // Arrange
-        BankAccount account = new BankAccount(); // Initial balance of 0
-        account.setBalance(new BigDecimal("100.00"));
+        Optional<BankAccount> mockedAccount = getMockedAccount();
+        when(bankAccountRepository.findById(accountId)).thenReturn(mockedAccount);
+
         BigDecimal depositAmount = new BigDecimal("-50.00");
 
         // Act
         assertThrows(DepositAcountException.class,
-                () -> bankAccountService.deposit(account, depositAmount),
+                () -> bankAccountService.deposit(accountId, depositAmount),
                 "A deposit of negative Amount should not be allowed.");
     }
+
     @Test
     @DisplayName("Should throw an error when a deposit amount of zero is provided")
     public void testDepositThrowsErrorForZeroAmount() {
-        BankAccount account = new BankAccount(); // Initial balance of 0
-        account.setBalance(new BigDecimal("100.00"));
-        BigDecimal depositAmount = new BigDecimal("00");
+        Optional<BankAccount> mockedAccount = getMockedAccount();
+        when(bankAccountRepository.findById(accountId)).thenReturn(mockedAccount);
+        BigDecimal depositAmount = new BigDecimal("0");
 
         // Act
         assertThrows(DepositAcountException.class,
-                () -> bankAccountService.deposit(account, depositAmount),
+                () -> bankAccountService.deposit(accountId, depositAmount),
                 "A deposit of zero should not be allowed.");
+    }
+
+    private Optional<BankAccount> getMockedAccount() {
+        return Optional.of(BankAccount.builder()
+                .id(1L)
+                .balance(new BigDecimal(100.00))
+                .build());
+    }
+
+    private Optional<BankAccount> getMockedEmptyAccount() {
+        return Optional.of(BankAccount.builder()
+                .id(1L)
+                .balance(new BigDecimal(0))
+                .build());
     }
 }
