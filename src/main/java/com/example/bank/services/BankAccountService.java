@@ -6,6 +6,8 @@ import com.example.bank.model.BankAccount;
 import java.math.BigDecimal;
 
 public interface BankAccountService {
-    void deposit(Long accountId, BigDecimal amount) throws DepositAcountException;
+    void makeDeposit(Long accountId, BigDecimal amount) throws DepositAcountException;
+
     BankAccount getAccountById(Long accountId) throws DepositAcountException;
+    void makeWithdraw(Long accountId, BigDecimal amount) throws DepositAcountException;
 }

@@ -49,7 +49,7 @@ public class BankAccountController {
     public ResponseEntity<String> makeDeposit(@PathVariable Long id,
                                               @RequestParam(name = "amount") BigDecimal amount) {
         try {
-            bankService.deposit(id, amount);
+            bankService.makeDeposit(id, amount);
             return ResponseEntity.ok("Deposit successful");
         } catch (DepositAcountException e) {
             logger.error("Deposit failed for account ID: {} with amount: {}", id, amount, e);
@@ -59,6 +59,21 @@ public class BankAccountController {
             logger.error("Unexpected error during deposit for account ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
         }
+    }
 
+    @PostMapping("/{id}/withdrawalAccount")
+    public ResponseEntity<String> makeWithdrawal(@PathVariable Long id,
+                                                 @RequestParam(name = "amount") BigDecimal amount) {
+        try {
+            bankService.makeWithdraw(id, amount);
+            return ResponseEntity.ok("Withdrawal successful");
+        } catch (DepositAcountException e) {
+            logger.error("Withdrawal failed for account ID: {} with amount: {}", id, amount, e);
+            String errorMessage = "Withdrawal failed: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+        } catch (Exception e) {
+            logger.error("Unexpected error during Withdrawal for account ID: {}", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
+        }
     }
 }

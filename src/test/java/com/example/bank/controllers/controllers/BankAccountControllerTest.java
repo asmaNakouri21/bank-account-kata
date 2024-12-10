@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class BankAccountControllerTest {
     @InjectMocks
@@ -67,9 +66,7 @@ class BankAccountControllerTest {
     @DisplayName("Should return 200 OK when deposit is successful")
     public void testMakeDeposit_Success() throws Exception {
         BigDecimal amount = new BigDecimal("100.00");
-
-        // Mocking the service call to simulate a successful deposit
-        doNothing().when(bankAccountService).deposit(eq(ACCOUNT_ID), eq(amount));
+        doNothing().when(bankAccountService).makeDeposit(eq(ACCOUNT_ID), eq(amount));
 
         MockHttpServletResponse response = mockMvc
                 .perform(post("/account/{id}/depositAccount", ACCOUNT_ID)
@@ -86,7 +83,7 @@ class BankAccountControllerTest {
         BigDecimal amount = new BigDecimal("-50.00"); // Invalid deposit (negative)
 
         // Mocking the service to throw DepositAcountException
-        doThrow(new DepositAcountException("Deposit amount must be greater than zero")).when(bankAccountService).deposit(eq(ACCOUNT_ID), eq(amount));
+        doThrow(new DepositAcountException("Deposit amount must be greater than zero")).when(bankAccountService).makeDeposit(eq(ACCOUNT_ID), eq(amount));
 
         MockHttpServletResponse response = mockMvc
                 .perform(post("/account/{id}/depositAccount", ACCOUNT_ID)
@@ -101,12 +98,59 @@ class BankAccountControllerTest {
     @DisplayName("Should return 500 Internal Server Error when an unexpected error occurs")
     public void testMakeDeposit_Fail_InternalServerError() throws Exception {
         BigDecimal amount = new BigDecimal("100.00");
-
-        // Mocking the service to throw a general exception
-        doThrow(new RuntimeException("Unexpected error")).when(bankAccountService).deposit(eq(ACCOUNT_ID), eq(amount));
+        doThrow(new RuntimeException("Unexpected error")).when(bankAccountService).makeDeposit(eq(ACCOUNT_ID), eq(amount));
 
         MockHttpServletResponse response = mockMvc
                 .perform(post("/account/{id}/depositAccount", ACCOUNT_ID)
+                        .param("amount", amount.toString()))
+                .andReturn().getResponse();
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatus());
+        assertEquals("Internal Server Error", response.getContentAsString());
+    }
+
+    @Test
+    @DisplayName("Should return 200 OK when Withdrawal is successful")
+    public void testMakeWithdrawal_Success() throws Exception {
+        BigDecimal amount = new BigDecimal("100.00");
+
+        doNothing().when(bankAccountService).makeWithdraw(eq(ACCOUNT_ID), eq(amount));
+
+        MockHttpServletResponse response = mockMvc
+                .perform(post("/account/{id}/withdrawalAccount", ACCOUNT_ID)
+                        .param("amount", amount.toString()))
+                .andReturn().getResponse();
+
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertEquals("Withdrawal successful", response.getContentAsString());
+    }
+
+    @Test
+    @DisplayName("Should return 400 Bad Request when Withdrawal fails with Exception")
+    public void testMakeWithdrawal_Fail_WithdrawalAcountException() throws Exception {
+        BigDecimal amount = new BigDecimal("-50.00");
+
+        doThrow(new DepositAcountException("Withdrawal amount must be greater than zero")).when(bankAccountService)
+                .makeWithdraw(eq(ACCOUNT_ID), eq(amount));
+
+        MockHttpServletResponse response = mockMvc
+                .perform(post("/account/{id}/withdrawalAccount", ACCOUNT_ID)
+                        .param("amount", amount.toString()))
+                .andReturn().getResponse();
+
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        assertEquals("Withdrawal failed: Withdrawal amount must be greater than zero", response.getContentAsString());
+    }
+
+    @Test
+    @DisplayName("Should return 500 Internal Server Error when an unexpected error occurs")
+    public void testMakeWithdrawal_Fail_InternalServerError() throws Exception {
+        BigDecimal amount = new BigDecimal("100.00");
+
+        doThrow(new RuntimeException("Unexpected error")).when(bankAccountService).makeWithdraw(eq(ACCOUNT_ID), eq(amount));
+
+        MockHttpServletResponse response = mockMvc
+                .perform(post("/account/{id}/withdrawalAccount", ACCOUNT_ID)
                         .param("amount", amount.toString()))
                 .andReturn().getResponse();
 

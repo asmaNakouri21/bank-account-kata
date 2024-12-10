@@ -41,7 +41,7 @@ public class BankAccountServiceTest {
         BigDecimal depositAmount = new BigDecimal("100.00");
 
         // Act
-        bankAccountService.deposit(accountId, depositAmount);
+        bankAccountService.makeDeposit(accountId, depositAmount);
 
         // Assert
         assertEquals(new BigDecimal("100.00"), mockedAccount.get().getBalance(),
@@ -58,7 +58,7 @@ public class BankAccountServiceTest {
         BigDecimal depositAmount = new BigDecimal("50.29");
 
         // Act
-        bankAccountService.deposit(accountId, depositAmount);
+        bankAccountService.makeDeposit(accountId, depositAmount);
 
         // Assert
         assertEquals(new BigDecimal("150.29"), mockedAccount.get().getBalance(),
@@ -76,7 +76,7 @@ public class BankAccountServiceTest {
 
         // Act
         assertThrows(DepositAcountException.class,
-                () -> bankAccountService.deposit(accountId, depositAmount),
+                () -> bankAccountService.makeDeposit(accountId, depositAmount),
                 "A deposit of negative Amount should not be allowed.");
     }
 
@@ -89,7 +89,7 @@ public class BankAccountServiceTest {
 
         // Act
         assertThrows(DepositAcountException.class,
-                () -> bankAccountService.deposit(accountId, depositAmount),
+                () -> bankAccountService.makeDeposit(accountId, depositAmount),
                 "A deposit of zero should not be allowed.");
     }
 
@@ -133,4 +133,68 @@ public class BankAccountServiceTest {
                 .balance(new BigDecimal(0))
                 .build());
     }
+
+    @Test
+    @DisplayName("Should deduct the withdrawal amount when balance is sufficient")
+    void testWithdrawalWhenBalanceIsSufficient() throws DepositAcountException {
+        // Arrange
+        Optional<BankAccount> account = getMockedAccount();
+        when(bankAccountRepository.findById(1L)).thenReturn(account);
+        BigDecimal withdrawalAmount = new BigDecimal("50.00");
+
+        // Act
+        bankAccountService.makeWithdraw(1L, withdrawalAmount);
+
+        // Assert
+        assertEquals(new BigDecimal("50.00"), account.get().getBalance());
+    }
+
+    @Test
+    @DisplayName("Should throw an error when balance is insufficient")
+    void testWithdrawalFailsDueToInsufficientBalance() {
+        // Arrange
+        BankAccount account = getMockedAccount().get();
+        when(bankAccountRepository.findById(1L)).thenReturn(Optional.of(account));
+        BigDecimal withdrawalAmount = new BigDecimal("150.00");
+
+        // Act & Assert
+        assertThrows(Exception.class, () -> bankAccountService.makeWithdraw(1L, withdrawalAmount));
+    }
+
+    @Test
+    @DisplayName("Should throw an error for negative or zero withdrawal amount")
+    void testWithdrawalFailsDueToInvalidAmount() {
+        // Arrange
+        BankAccount account = getMockedAccount().get();
+        when(bankAccountRepository.findById(1L)).thenReturn(Optional.of(account));
+
+        // Act & Assert
+        assertThrows(Exception.class, () -> bankAccountService.makeWithdraw(1L, new BigDecimal("-10.00")));
+    }
+
+    @Test
+    @DisplayName("Should throw an error for negative or zero withdrawal amount")
+    void testWithdrawalFailsDueToZeriWithdrawal() {
+        // Arrange
+        BankAccount account = getMockedAccount().get();
+        when(bankAccountRepository.findById(1L)).thenReturn(Optional.of(account));
+
+        // Act & Assert
+        assertThrows(Exception.class, () -> bankAccountService.makeWithdraw(1L, BigDecimal.ZERO));
+    }
+
+    @Test
+    @DisplayName("Should throw an error when account does not exist")
+    void testWithdrawalFailsWhenAccountDoesNotExist() {
+        // Arrange
+        when(bankAccountRepository.findById(1L)).thenReturn(Optional.empty());
+        BigDecimal withdrawalAmount = new BigDecimal("50.00");
+
+        // Act & Assert
+        assertThrows(DepositAcountException.class,
+                () -> bankAccountService.getAccountById(accountId),
+                "Account does not exist");
+
+    }
+
 }
