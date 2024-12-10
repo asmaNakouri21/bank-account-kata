@@ -7,4 +7,5 @@ import java.math.BigDecimal;
 
 public interface BankAccountService {
     void deposit(Long accountId, BigDecimal amount) throws DepositAcountException;
+    BankAccount getAccountById(Long accountId) throws DepositAcountException;
 }

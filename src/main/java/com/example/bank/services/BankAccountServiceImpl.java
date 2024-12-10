@@ -33,6 +33,6 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     public BankAccount getAccountById(Long accountId) throws DepositAcountException {
         return bankAccountRepository.findById(accountId)
-                .orElseThrow(() -> new DepositAcountException("Account does not exist"));
+                .orElseThrow(() -> new DepositAcountException("Account not found"));
     }
 }
