@@ -136,7 +136,7 @@ public class BankAccountServiceTest {
 
     @Test
     @DisplayName("Should deduct the withdrawal amount when balance is sufficient")
-    void testWithdrawalWhenBalanceIsSufficient(){
+    void testWithdrawalWhenBalanceIsSufficient() throws DepositAcountException {
         // Arrange
         Optional<BankAccount> account = getMockedAccount();
         when(bankAccountRepository.findById(1L)).thenReturn(account);

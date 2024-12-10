@@ -1,6 +1,7 @@
 package com.example.bank.services;
 
 import com.example.bank.dao.BankAccountRepository;
+import com.example.bank.enums.OperationType;
 import com.example.bank.exception.DepositAcountException;
 import com.example.bank.model.BankAccount;
 import jakarta.transaction.Transactional;
@@ -24,11 +25,8 @@ public class BankAccountServiceImpl implements BankAccountService {
     @Override
     public void makeDeposit(Long accountId, BigDecimal amount) throws DepositAcountException {
         BankAccount account = getAccountById(accountId);
-        Objects.requireNonNull(amount, "Deposit amount cannot be null.");
-        if (amount.signum() <= 0) {
-            throw new DepositAcountException("Deposit amount must be greater than zero.");
-        }
-        account.setBalance(account.getBalance().add(amount));
+        validateAmount(amount,account.getBalance(), OperationType.DEPOSIT);
+        updateAccountBalance(account, amount);
     }
 
     @Override
@@ -38,6 +36,25 @@ public class BankAccountServiceImpl implements BankAccountService {
     }
 
     @Override
-    public void makeWithdraw(Long accountId, BigDecimal amount) {
+    public void makeWithdraw(Long accountId, BigDecimal amount) throws DepositAcountException {
+        BankAccount account = getAccountById(accountId);
+        validateAmount(amount, account.getBalance(),OperationType.WITHDRAWAL);
+        updateAccountBalance(account, amount.negate());
+    }
+
+    private void validateAmount(BigDecimal amount, BigDecimal balance, OperationType operationName) throws DepositAcountException {
+        Objects.requireNonNull(amount, operationName + " cannot be null.");
+        if (amount.signum() <= 0) {
+            throw new DepositAcountException(operationName + " must be greater than zero.");
+        }
+        if (operationName.equals(OperationType.WITHDRAWAL) &&
+                balance.compareTo(amount) < 0) {
+            throw new DepositAcountException("Insufficient balance for withdrawal.");
+        }
+    }
+
+    private void updateAccountBalance(BankAccount account, BigDecimal amount) {
+        account.setBalance(account.getBalance().add(amount));
+        bankAccountRepository.save(account);
     }
 }
