@@ -1,4 +1,4 @@
-package com.example.bank.controllers;
+package com.example.bank.controller;
 
 import com.example.bank.exception.AccountNotFoundException;
 import com.example.bank.exception.InvalidAmountException;
@@ -11,7 +11,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;

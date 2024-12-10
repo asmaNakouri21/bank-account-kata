@@ -1,4 +1,4 @@
-package com.example.bank.controllers;
+package com.example.bank.controller;
 
 import com.example.bank.dtao.OperationDto;
 import com.example.bank.exception.HistoryNotFoundException;

@@ -1,4 +1,4 @@
-package com.example.bank.controllers;
+package com.example.bank.controller;
 
 import com.example.bank.dtao.OperationDto;
 import com.example.bank.exception.HistoryNotFoundException;
@@ -21,12 +21,8 @@ public class BankAccountHistoryContoller {
 
     private static final Logger logger = LoggerFactory.getLogger(BankAccountHistoryContoller.class);
 
-    private final BankAccountHistoryService historyService;
-
     @Autowired
-    public BankAccountHistoryContoller(BankAccountHistoryService historyService) {
-        this.historyService = historyService;
-    }
+    private  BankAccountHistoryService historyService;
 
     @GetMapping("/{id}/history")
     public ResponseEntity<?> getAccountHistory(@PathVariable Long id) {

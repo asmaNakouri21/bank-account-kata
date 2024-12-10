@@ -6,7 +6,6 @@ import com.example.bank.exception.AccountNotFoundException;
 import com.example.bank.exception.InvalidAmountException;
 import com.example.bank.model.BankAccount;
 import com.example.bank.services.BankAccountService;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,15 +13,10 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 @Service
-@Transactional
 public class BankAccountServiceImpl implements BankAccountService {
-
-    private final BankAccountRepository bankAccountRepository;
-
     @Autowired
-    public BankAccountServiceImpl(BankAccountRepository bankAccountRepository) {
-        this.bankAccountRepository = bankAccountRepository;
-    }
+    private BankAccountRepository bankAccountRepository;
+
 
     @Override
     public void makeDeposit(Long accountId, BigDecimal amount) throws InvalidAmountException {

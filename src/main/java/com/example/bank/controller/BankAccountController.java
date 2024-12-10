@@ -1,4 +1,4 @@
-package com.example.bank.controllers;
+package com.example.bank.controller;
 
 
 import com.example.bank.exception.AccountNotFoundException;
@@ -26,15 +26,10 @@ import java.math.BigDecimal;
 @RequestMapping("/account")
 public class BankAccountController {
 
-    private final BankAccountService bankService;
+    @Autowired
+    private BankAccountServiceImpl bankService;
 
     private static final Logger logger = LoggerFactory.getLogger(BankAccountController.class);
-
-    @Autowired
-    public BankAccountController(BankAccountServiceImpl bankService) {
-        this.bankService = bankService;
-    }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<BankAccount> getAccountById(@PathVariable @NotNull Long id) {

@@ -7,20 +7,15 @@ import com.example.bank.model.Deposit;
 import com.example.bank.model.Operation;
 import com.example.bank.model.Withdraw;
 import com.example.bank.services.BankAccountHistoryService;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 @Service
-@Transactional
 public class BankAccountHistoryServiceImpl implements BankAccountHistoryService {
-    private final BankAccountHistoryRepository historyRepository;
-
     @Autowired
-    public BankAccountHistoryServiceImpl(BankAccountHistoryRepository bankAccountRepository) {
-        this.historyRepository = bankAccountRepository;
-    }
+    private BankAccountHistoryRepository historyRepository;
+
     @Override
     public List<OperationDto> getHistoryByAccountId(Long accountId){
         var operations = historyRepository.findAllByMyAccount_Id(accountId);
